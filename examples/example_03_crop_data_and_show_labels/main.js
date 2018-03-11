@@ -35,11 +35,15 @@ dataStore.getLabels = function(){
   // return a data list of the points that should have labels.
   series = this.compiled[0]
   var min = series[d3.scan(series, function(a, b) { return a.value - b.value; })]
+  min.position = "bottom"
   var max = series[d3.scan(series, function(a, b) { return b.value - a.value; })]
-  var leftMost = series[0]
+  max.position = "top"
+  // var leftMost = series[0]
+  // leftMost.position = "bottom"
   var rightMost = series[series.length -1]
+  rightMost.position = "top"
 
-  var needLabels = new Set([min, max, leftMost, rightMost])
+  var needLabels = new Set([min, max, /*leftMost,*/ rightMost])
 
   return Array.from(needLabels)
 }
@@ -78,6 +82,23 @@ var xGridlines = d3.axisBottom(xScale)
 
 var zoom = d3.zoom().on("zoom", zoomed)
 
+// Define labelling function
+function applyLabels(selection){
+  var newLabels = selection.enter()
+      .append("g")
+      .attr("class", "label")
+
+  newLabels.append("text")
+  newLabels.merge(selection)
+      .attr("transform", function(d){ return "translate(" + xScale(d.time) + "," + yScale(d.value) + ")"; })
+      .select("text")
+      // .attr("x", function(d){ return xScale(d.time); })
+      // .attr("y", 50)
+      .attr("text-anchor", "middle")
+      .attr("y", function(d){ if(d.position == "top") return -10; else return 20})
+      .text(function(d){ return " " + d.value; })
+  selection.exit().remove()
+}
 
 // append the svg object to the body of the page
 var svg = d3.select("body").append("svg")
@@ -124,19 +145,7 @@ function render(){
 
   // -- Labels --
   var labeledPoints = dataStore.getLabels()
-  var labels = view.selectAll(".label").data(labeledPoints)
-
-  var newLabels = labels.enter()
-      .append("g")
-      .attr("class", "label")
-  newLabels.append("text")
-  newLabels.merge(labels)
-      .attr("transform", function(d){ return "translate(" + xScale(d.time) + "," + yScale(d.value) + ")"; })
-      .select("text")
-      // .attr("x", function(d){ return xScale(d.time); })
-      // .attr("y", function(d){ return yScale(d.value); })
-      .text(function(d){ return " " + d.value; })
-  labels.exit().remove()
+  var labels = view.selectAll(".label").data(labeledPoints).call(applyLabels)
 }
 render()
 
