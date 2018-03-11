@@ -31,21 +31,45 @@ dataStore.crop = function(){
   return sliced
 }
 
+var peakFinder = d3_peaks.findPeaks()
+    .kernel(d3_peaks.ricker)
+    .gapThreshold(3)
+    .minLineLength(3)
+    .minSNR(3)
+    .widths([2, 3, 4, 5]);
+
 dataStore.getLabels = function(){
   // return a data list of the points that should have labels.
+
   series = this.compiled[0]
-  var min = series[d3.scan(series, function(a, b) { return a.value - b.value; })]
-  min.position = "bottom"
-  var max = series[d3.scan(series, function(a, b) { return b.value - a.value; })]
-  max.position = "top"
-  // var leftMost = series[0]
-  // leftMost.position = "bottom"
+  // var min = series[d3.scan(series, function(a, b) { return a.value - b.value; })]
+  // min.position = "bottom"
+  // var max = series[d3.scan(series, function(a, b) { return b.value - a.value; })]
+  // max.position = "top"
   var rightMost = series[series.length -1]
   rightMost.position = "top"
+  // var needLabels = new Set([min, max, rightMost])
+  // return Array.from(needLabels)
 
-  var needLabels = new Set([min, max, /*leftMost,*/ rightMost])
+  // find maxima
+  var signal = series.map(function(d){return d.value})
+  var indices = peakFinder(signal); // list of {index:, width:, snr:}
+  var maxima = indices.map(function(d){
+    var p = series[d.index]
+    p.position = "top"
+    return p
+  })
 
-  return Array.from(needLabels)
+  // find minima:
+  var signal = series.map(function(d){return -d.value})
+  var indices = peakFinder(signal); // list of {index:, width:, snr:}
+  var minima = indices.map(function(d){
+    var p = series[d.index]
+    p.position = "bottom"
+    return p
+  })
+
+  return d3.merge([maxima, minima, [rightMost]])
 }
 
 dataStore.compile = function(){
