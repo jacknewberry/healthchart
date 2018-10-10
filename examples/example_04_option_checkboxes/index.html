@@ -6,7 +6,6 @@
   fill: none;
   stroke: #458ffe;
   stroke-width: 2px;
-  clip-path: url(#clip);
 }
 
 .zoom {
@@ -135,11 +134,11 @@ body {
 <div class="control-group">
   <!-- https://kyusuf.com/post/completely-css-custom-checkbox-radio-buttons-and-select-boxes -->
 	<label class="control control--checkbox">Show Labels
-		<input type="checkbox" checked="checked" onclick="onclick_showLabels(this)"/>
+		<input type="checkbox" checked="checked" onclick="onclick_toggleLabels(this)"/>
 		<div class="control__indicator"></div>
 	</label>
 	<label class="control control--checkbox">Clip View
-		<input type="checkbox" checked="checked" onclick="onclick_clipView(this)"/>
+		<input type="checkbox" checked="checked" onclick="onclick_toggleClipView(this)"/>
 		<div class="control__indicator"></div>
 	</label>
 	<label class="control control--checkbox">Disabled

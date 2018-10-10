@@ -74,7 +74,7 @@ dataStore.getLabels = function(){
   return d3.merge([maxima, minima, [rightMost]])
 }
 
-dataStore.compile = function(){
+dataStore.data = function(){
   this.compiled = this.crop();
   return this.compiled
 }
@@ -136,7 +136,7 @@ var view = svg.append("g")
           "translate(" + margin.left + "," + margin.top + ")")
 
 var clipPath = view.append("defs").append("clipPath")
-    .attr("id", "clip")
+    .attr("id", "clip-chart-area")
 clipPath.append("rect")
     .attr("width", width)
     .attr("height", height);
@@ -157,10 +157,18 @@ var gY = view.append("g")
 
 function render(){
   dataStore.domain = xScale.domain();
-  var data = dataStore.compile();
+  var data = dataStore.data();
 
   yScale.domain([0, d3.max(data[0], function(d) { return d.value; })]);
   gY.call(yAxis.scale(yScale));
+
+  // -- Clip Path --
+  var seriesClipPathAttr;
+  if( MASK_VIEW ){
+    seriesClipPathAttr = "url(#clip-chart-area)"
+  } else {
+    seriesClipPathAttr = null
+  }
 
   // -- Series --
   var paths = view.selectAll(".line").data(data)
@@ -171,8 +179,9 @@ function render(){
   // UPDATE, with new nodes included
     .merge(paths)
       .attr("d", line)
+      .attr("clip-path", seriesClipPathAttr)
 
-  // // -- Line Annotations --
+  // -- Line Annotations --
   var annotationLines = view.selectAll(".annotationLine").data([{"value":60}, {"value":100}])
   annotationLines.enter()
     .append("line")
@@ -192,12 +201,6 @@ function render(){
   }
   var labels = view.selectAll(".dataLabel").data(labeledPoints).call(applyLabels)
 
-  // -- Clip Path --
-  if( MASK_VIEW ){
-    clipPath.attr("id", "clip")
-  } else {
-    clipPath.attr("id", "clip_off")
-  }
 }
 render()
 
@@ -223,11 +226,11 @@ function resetZoom() {
       .call(zoom.transform, d3.zoomIdentity);
 }
 
-function onclick_showLabels(e){
+function onclick_toggleLabels(e){
  SHOW_LABELS = e.checked
  render()
 }
-function onclick_clipView(e){
+function onclick_toggleClipView(e){
  MASK_VIEW = e.checked
  render()
 }
