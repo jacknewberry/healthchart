@@ -137,13 +137,21 @@ body {
 		<input type="checkbox" checked="checked" onclick="onclick_toggleLabels(this)"/>
 		<div class="control__indicator"></div>
 	</label>
-	<label class="control control--checkbox">Clip View
-		<input type="checkbox" checked="checked" onclick="onclick_toggleClipView(this)"/>
+	<label class="control control--checkbox">Clip Series
+		<input type="checkbox" onclick="onclick_toggleClipView(this)"/>
 		<div class="control__indicator"></div>
 	</label>
-	<label class="control control--checkbox">Disabled
+	<!-- <label class="control control--checkbox">Disabled
 		<input type="checkbox" disabled="disabled"/>
 		<div class="control__indicator"></div>
+	</label> -->
+	<label>Upper Guideline
+		<input id="upper-annotation" type="number" min="0" max="1000" step="1" value="100" oninput="oninput_upperAnnotation(this)"/>
+		<div ></div>
+	</label>
+	<label>Lower Guideline
+		<input id="lower-annotation" type="number" min="0" max="1000" step="1" value="60" oninput="oninput_lowerAnnotation(this)"/>
+		<div ></div>
 	</label>
 </div>
 

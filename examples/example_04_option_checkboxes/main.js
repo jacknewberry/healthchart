@@ -1,7 +1,9 @@
 "use strict";
 
 var SHOW_LABELS = true;
-var MASK_VIEW = true;
+var CLIP_SERIES = false;
+var UPPER_ANNOTATION_VALUE = 100;
+var LOWER_ANNOTATION_VALUE = 60;
 
 
 // define the dimensions and margins of the graph
@@ -11,7 +13,7 @@ var margin = {top: 20, right: 20, bottom: 30, left: 50},
 
 // Get some data, minutes : HR
 function makeMeSomeData(){
-  var integers = dataGen(5000, 50, 140, 10);
+  var integers = dataGen(5000, 50, 150, 10);
   var time = 0;
   var dataArray = integers.map(function(int){
     time += 10 + (Math.random() * 10)
@@ -164,7 +166,7 @@ function render(){
 
   // -- Clip Path --
   var seriesClipPathAttr;
-  if( MASK_VIEW ){
+  if( CLIP_SERIES ){
     seriesClipPathAttr = "url(#clip-chart-area)"
   } else {
     seriesClipPathAttr = null
@@ -182,7 +184,10 @@ function render(){
       .attr("clip-path", seriesClipPathAttr)
 
   // -- Line Annotations --
-  var annotationLines = view.selectAll(".annotationLine").data([{"value":60}, {"value":100}])
+  d3.select("input#upper-annotation").attr("min", LOWER_ANNOTATION_VALUE+1)
+  d3.select("input#lower-annotation").attr("max", UPPER_ANNOTATION_VALUE-1)
+
+  var annotationLines = view.selectAll(".annotationLine").data([{"value":LOWER_ANNOTATION_VALUE}, {"value":UPPER_ANNOTATION_VALUE}])
   annotationLines.enter()
     .append("line")
       .attr("class", "annotationLine")
@@ -231,6 +236,16 @@ function onclick_toggleLabels(e){
  render()
 }
 function onclick_toggleClipView(e){
- MASK_VIEW = e.checked
+ CLIP_SERIES = e.checked
  render()
+}
+
+function oninput_upperAnnotation(e){
+  UPPER_ANNOTATION_VALUE = Number(e.value)
+  render()
+}
+
+function oninput_lowerAnnotation(e){
+  LOWER_ANNOTATION_VALUE = Number(e.value)
+  render()
 }
