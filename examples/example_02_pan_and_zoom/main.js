@@ -50,12 +50,6 @@ var view = svg.append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")")
 
-view.append("defs").append("clipPath")
-    .attr("id", "clip")
-  .append("rect")
-    .attr("width", width)
-    .attr("height", height);
-
 var gX = view.append("g")
     .attr("class", "x")
     .attr("transform", "translate(0," + height + ")")
@@ -65,7 +59,6 @@ var gXAxis = gX.append("g")
 var gXGridlines = gX.append("g")
     .attr("class", "gridlines")
     .call(xGridlines);
-
 
 var gY = view.append("g")
     .attr("class", "axis axis--y")
